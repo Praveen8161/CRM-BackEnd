@@ -57,8 +57,11 @@ const userSchema = new mongoose.Schema({
   ],
   notification: [
     {
-      type: ObjectId,
-      trim: true,
+      data: {
+        type: ObjectId,
+        ref: "Notification",
+        trim: true,
+      },
       readStatus: {
         type: Boolean,
         default: false,

@@ -11,10 +11,11 @@ import {
 import { forgotRouter } from "./forgotPasswordRouter.js";
 import { updateRouter } from "./updateNewPassword.js";
 import { ticketRouter } from "./ticketRouter.js";
+import { notificationRouter } from "./notificationRouter.js";
 
 const router = express.Router();
 
-// middleware function for forgot password
+// Middleware function for forgot password
 const checkManager = async (req, res, next) => {
   try {
     // user exist
@@ -27,7 +28,7 @@ const checkManager = async (req, res, next) => {
   }
 };
 
-// check user by token for update password
+// Check user by token for update password
 const checkManagerByToken = async (req, res, next) => {
   try {
     const { id, token } = req.params;
@@ -41,7 +42,7 @@ const checkManagerByToken = async (req, res, next) => {
   }
 };
 
-// check user by Session Token for logout and to use App features
+// Check user by Session Token for logout and to use App features
 const checkManagerBySessionToken = async (req, res, next) => {
   try {
     // user exist
@@ -54,7 +55,7 @@ const checkManagerBySessionToken = async (req, res, next) => {
   }
 };
 
-// to send activation email
+// To send activation email
 async function activationMail(email) {
   const actToken = genearateActiveToken(email);
 
@@ -111,7 +112,7 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-// login
+// Login
 router.post("/login", async (req, res) => {
   try {
     // user exist
@@ -179,7 +180,7 @@ router.post("/resendemail", async (req, res) => {
   }
 });
 
-// logout
+// Logout
 router.get("/logout", async (req, res) => {
   try {
     // check user
@@ -203,13 +204,16 @@ router.get("/logout", async (req, res) => {
   }
 });
 
-// forgot password
+// Forgot password
 router.use("/forgot", checkManager, forgotRouter);
 
-// update password
+// Update password
 router.use("/update", checkManagerByToken, updateRouter);
 
-// tickets
+// Tickets
 router.use("/ticket", checkManagerBySessionToken, ticketRouter);
+
+// Notification
+router.use("/notify", checkManagerBySessionToken, notificationRouter);
 
 export const managerRouter = router;

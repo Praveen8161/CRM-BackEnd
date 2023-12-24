@@ -5,6 +5,11 @@ export function getUser(req) {
   return User.findOne({ email: req.body.email });
 }
 
+// find one user by email
+export function getAllUser(req) {
+  return User.find();
+}
+
 // add new user
 export function newUser(user) {
   return new User(user).save();

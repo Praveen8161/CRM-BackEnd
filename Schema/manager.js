@@ -55,10 +55,6 @@ const managerSchema = new mongoose.Schema({
       trim: true,
     },
   ],
-  notification: {
-    type: ObjectId,
-    trim: true,
-  },
 });
 
 export const Manager = mongoose.model("Manager", managerSchema);

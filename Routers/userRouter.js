@@ -11,6 +11,7 @@ import { genearateActiveToken, genearateSessionToken } from "../Auth/auth.js";
 import { updateRouter } from "./updateNewPassword.js";
 import { ticketRouter } from "./ticketRouter.js";
 import { forgotRouter } from "./forgotPasswordRouter.js";
+import { notificationRouter } from "./notificationRouter.js";
 
 const router = express.Router();
 
@@ -211,4 +212,8 @@ router.use("/update", checkUserByToken, updateRouter);
 
 // tickets
 router.use("/ticket", checkUserBySessionToken, ticketRouter);
+
+// notification
+router.use("/notify", notificationRouter);
+
 export const userRouter = router;
