@@ -1,7 +1,6 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { getUserByToken } from "../Controllers/user.js";
 const router = express.Router();
 
 // middleware verify user

@@ -3,8 +3,6 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { dbConnect } from "./Models/db.js";
 import { userRouter } from "./Routers/userRouter.js";
-import { forgotRouter } from "./Routers/forgotPasswordRouter.js";
-import { resetRouter } from "./Routers/updateNewPassword.js";
 import { managerRouter } from "./Routers/managerRouter.js";
 import { adminRouter } from "./Routers/adminRouter.js";
 

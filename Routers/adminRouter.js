@@ -43,7 +43,7 @@ const checkUserByToken = async (req, res, next) => {
 };
 
 // check user by Session Token for logout and to use App features
-const checkUserBySessionToken = async (req, res, next) => {
+const checkAdminBySessionToken = async (req, res, next) => {
   try {
     // user exist
     const user = await getUserBySessionToken(req);
@@ -211,9 +211,9 @@ router.use("/forgot", checkAdmin, forgotRouter);
 router.use("/update", checkUserByToken, updateRouter);
 
 // tickets
-router.use("/ticket", checkUserBySessionToken, ticketRouter);
+router.use("/ticket", checkAdminBySessionToken, ticketRouter);
 
 // Notification
-router.use("/notify", checkManagerBySessionToken, notificationRouter);
+router.use("/notify", checkAdminBySessionToken, notificationRouter);
 
 export const adminRouter = router;
