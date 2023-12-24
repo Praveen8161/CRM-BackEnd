@@ -11,6 +11,7 @@ import {
 import { ticketRouter } from "./ticketRouter.js";
 import { forgotRouter } from "./forgotPasswordRouter.js";
 import { updateRouter } from "./updateNewPassword.js";
+import { notificationRouter } from "./notificationRouter.js";
 
 const router = express.Router();
 
@@ -211,5 +212,8 @@ router.use("/update", checkUserByToken, updateRouter);
 
 // tickets
 router.use("/ticket", checkUserBySessionToken, ticketRouter);
+
+// Notification
+router.use("/notify", checkManagerBySessionToken, notificationRouter);
 
 export const adminRouter = router;

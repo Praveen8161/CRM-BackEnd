@@ -51,8 +51,7 @@ const userSchema = new mongoose.Schema({
   },
   activity: [
     {
-      type: String,
-      trim: true,
+      time: { type: String, trim: true },
     },
   ],
   notification: [
@@ -66,6 +65,12 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
       },
+    },
+  ],
+  services: [
+    {
+      type: ObjectId,
+      ref: "Service",
     },
   ],
 });

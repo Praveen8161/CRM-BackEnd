@@ -16,17 +16,20 @@ const serviceSchema = new mongoose.Schema({
   },
   createdBy: {
     type: ObjectId,
+    ref: "Admin",
     trim: true,
   },
   currentUser: [
     {
       type: ObjectId,
+      ref: "User",
       trim: true,
     },
   ],
   oldUser: [
     {
       type: ObjectId,
+      ref: "User",
       trim: true,
     },
   ],

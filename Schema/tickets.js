@@ -36,10 +36,12 @@ const ticketSchema = new mongoose.Schema({
   },
   createdBy: {
     type: ObjectId,
+    ref: "User",
     trim: true,
   },
   resolvedBy: {
     type: ObjectId,
+    ref: "Manager",
     trim: true,
   },
   resolveComment: {

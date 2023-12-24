@@ -6,7 +6,7 @@ export function getUser(req) {
 }
 
 // find one user by email
-export function getAllUser(req) {
+export function getAllUser() {
   return User.find();
 }
 

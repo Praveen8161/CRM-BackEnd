@@ -23,7 +23,13 @@ const notificationSchema = new mongoose.Schema({
   },
   createdBy: {
     type: ObjectId,
+    refPath: "onModel",
     trim: true,
+  },
+  onModel: {
+    type: String,
+    enum: ["Manager", "Admin"],
+    required: true,
   },
 });
 

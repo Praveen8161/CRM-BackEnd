@@ -95,9 +95,10 @@ router.post("/createnotify", async (req, res) => {
     const addNotify = [{ data: newNotify._id, readStatus: false }];
 
     // Adding the new notification to all the users
-    users.forEach((val) => {
-      val.notification = [...val.notification, addNotify];
-    });
+    for (let val of users) {
+      val.notification.push(addNotify);
+      await val.save();
+    }
 
     return res.status(201).json({ acknowledged: true, data: newNotify });
   } catch (err) {
