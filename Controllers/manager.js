@@ -12,7 +12,12 @@ export function newManager(user) {
 
 // get Manager by token for updating password
 export async function getManagerByToken(token) {
-  return Manager.findOne({ token: token });
+  return Manager.findOne({ token: req.params.token });
+}
+
+// activate account by activation token
+export function getManagerByActToken(req) {
+  return Manager.findOne({ activationToken: req.params.token });
 }
 
 // get Manager by Session Token

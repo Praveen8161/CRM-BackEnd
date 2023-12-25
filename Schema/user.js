@@ -73,6 +73,11 @@ const userSchema = new mongoose.Schema({
       ref: "Service",
     },
   ],
+  account: {
+    type: String,
+    required: true,
+    default: "inactive",
+  },
 });
 
 export const User = mongoose.model("User", userSchema);

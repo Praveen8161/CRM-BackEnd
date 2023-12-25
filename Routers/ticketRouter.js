@@ -47,7 +47,7 @@ router.get("/view", async (req, res) => {
 });
 
 // Delete ticket -- Admin
-router.delete("delete", async (req, res) => {
+router.delete("/delete", async (req, res) => {
   try {
     if (req.user.role === "Admin") {
       const deleteOneTicket = await deleteTicket(req);
@@ -62,7 +62,7 @@ router.delete("delete", async (req, res) => {
 });
 
 // Create ticket -- User
-router.post("create", async (req, res) => {
+router.post("/create", async (req, res) => {
   try {
     if (req.user.role === "User") {
       const newTicket = await createNewTicket(req);
@@ -85,7 +85,7 @@ router.post("create", async (req, res) => {
 });
 
 // Resolve ticket -- Admin and Manager
-router.post("resolve", async (req, res) => {
+router.post("/resolve", async (req, res) => {
   try {
     if (req.user.role === "User") {
       return res.status(404).json({

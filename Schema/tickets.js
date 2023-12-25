@@ -21,7 +21,7 @@ const ticketSchema = new mongoose.Schema({
     maxLength: [150, "Name should have at most 150 characters"],
   },
   ticketNumber: {
-    type: Number,
+    type: String,
     required: true,
     trim: true,
     default: () => randomStr.rnd(),

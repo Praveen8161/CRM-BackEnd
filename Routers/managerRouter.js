@@ -7,6 +7,7 @@ import {
   newManager,
   getManagerByToken,
   getManagerBySessionToken,
+  getManagerByActToken,
 } from "../Controllers/manager.js";
 import { forgotRouter } from "./forgotPasswordRouter.js";
 import { updateRouter } from "./updateNewPassword.js";
@@ -18,7 +19,7 @@ const router = express.Router();
 // Middleware function for forgot password
 const checkManager = async (req, res, next) => {
   try {
-    // user exist
+    // Manager exist by email
     const user = await getManager(req);
     if (!user) return res.status(404).json({ error: "user not found" });
     req.user = user;
@@ -34,8 +35,11 @@ const checkManagerByToken = async (req, res, next) => {
     const { id, token } = req.params;
     // user exist
     const user = await getManagerByToken(token);
+
     if (!user) return res.status(404).json({ error: "user not found" });
     req.user = user;
+    req.token = token;
+    req.id = id;
     next();
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
@@ -180,6 +184,29 @@ router.post("/resendemail", async (req, res) => {
   }
 });
 
+// Activate account
+router.get("/signup/activate/:token", async (req, res) => {
+  try {
+    // user exist
+    const user = await getManagerByActToken(req);
+    if (!user) return res.status(404).json({ error: "user not found" });
+    if (user.account === "active") {
+      user.activationToken = "";
+      await user.save();
+      return res.status(400).send("Your account is activated already");
+    }
+
+    // change account status to active
+    user.account = "active";
+    user.activationToken = "";
+    await user.save();
+
+    res.status(201).send("Your account has been activated");
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error", message: err });
+  }
+});
+
 // Logout
 router.get("/logout", async (req, res) => {
   try {
@@ -208,7 +235,7 @@ router.get("/logout", async (req, res) => {
 router.use("/forgot", checkManager, forgotRouter);
 
 // Update password
-router.use("/update", checkManagerByToken, updateRouter);
+router.use("/update/:id/:token", checkManagerByToken, updateRouter);
 
 // Tickets
 router.use("/ticket", checkManagerBySessionToken, ticketRouter);

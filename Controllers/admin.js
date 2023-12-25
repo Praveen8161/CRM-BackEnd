@@ -12,7 +12,12 @@ export function newAdmin(user) {
 
 // get Admin by token for update password
 export async function getAdminByToken(token) {
-  return Admin.findOne({ token: token });
+  return Admin.findOne({ token: req.params.token });
+}
+
+// activate account by activation token
+export function getAdminByActToken(req) {
+  return Admin.findOne({ activationToken: req.params.token });
 }
 
 // get Admin by Session Token for to use all app features and logout

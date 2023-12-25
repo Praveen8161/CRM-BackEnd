@@ -2,6 +2,7 @@ import express from "express";
 import bcrypt from "bcrypt";
 import {
   getUser,
+  getUserByActToken,
   getUserBySessionToken,
   getUserByToken,
   newUser,
@@ -18,7 +19,7 @@ const router = express.Router();
 // middleware function for forgot password
 const checkUser = async (req, res, next) => {
   try {
-    // user exist
+    // user exist by email
     const user = await getUser(req);
     if (!user) return res.status(404).json({ error: "user not found" });
     req.user = user;
@@ -34,8 +35,11 @@ const checkUserByToken = async (req, res, next) => {
     const { id, token } = req.params;
     // user exist
     const user = await getUserByToken(req);
+
     if (!user) return res.status(404).json({ error: "user not found" });
     req.user = user;
+    req.token = token;
+    req.id = id;
     next();
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
@@ -180,6 +184,29 @@ router.post("/resendemail", async (req, res) => {
   }
 });
 
+// Activate account
+router.get("/signup/activate/:token", async (req, res) => {
+  try {
+    // user exist
+    const user = await getUserByActToken(req);
+    if (!user) return res.status(404).json({ error: "user not found" });
+    if (user.account === "active") {
+      user.activationToken = "";
+      await user.save();
+      return res.status(400).send("Your account is activated already");
+    }
+
+    // change account status to active
+    user.account = "active";
+    user.activationToken = "";
+    await user.save();
+
+    res.status(201).send("Your account has been activated");
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error", message: err });
+  }
+});
+
 // logout
 router.get("/logout", async (req, res) => {
   try {
@@ -208,7 +235,7 @@ router.get("/logout", async (req, res) => {
 router.use("/forgot", checkUser, forgotRouter);
 
 // update password
-router.use("/update", checkUserByToken, updateRouter);
+router.use("/update/:id/:token", checkUserByToken, updateRouter);
 
 // tickets
 router.use("/ticket", checkUserBySessionToken, ticketRouter);

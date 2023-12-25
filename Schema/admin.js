@@ -55,6 +55,11 @@ const adminSchema = new mongoose.Schema({
       trim: true,
     },
   ],
+  account: {
+    type: String,
+    required: true,
+    default: "inactive",
+  },
 });
 
 export const Admin = mongoose.model("Admin", adminSchema);

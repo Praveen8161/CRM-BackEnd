@@ -7,23 +7,24 @@ const router = express.Router();
 router.post("/", async (req, res) => {
   try {
     // generate token
-    const token = genearateToken(user._id);
-    // sent mail with token
-    const sentedMail = await sentMail(
-      req.body.email,
-      user._id,
-      token,
-      req.body.link
-    );
-    // console.log(sentedMail);
-    if (!sentedMail)
-      return res.status(400).json({ error: "error sending mail" });
+    const token = genearateToken(req.user._id);
+
+    // // sent mail with token
+    // const sentedMail = await sentMail(
+    //   req.body.email,
+    //   req.user._id,
+    //   token,
+    //   req.body.link
+    // );
+
+    // if (!sentedMail)
+    //   return res.status(400).json({ error: "error sending mail" });
 
     // save token in Database
     req.user.token = token;
     await req.user.save();
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Email Sent Successfully",
       valid: "Email is valid for 15 mintues",
     });

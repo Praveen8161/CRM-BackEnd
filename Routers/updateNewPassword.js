@@ -6,10 +6,8 @@ const router = express.Router();
 // middleware verify user
 const verifyUser = async (req, res, next) => {
   try {
-    const { id, token } = req.params;
-
     // JWT verify
-    const jwtVerify = jwt.verify(token, process.env.SECRET_KEY);
+    const jwtVerify = jwt.verify(req.token, process.env.SECRET_KEY);
     if (!jwtVerify)
       res
         .status(400)
@@ -29,7 +27,7 @@ const verifyUser = async (req, res, next) => {
 };
 
 // To reset page
-router.get("/:id/:token", verifyUser, async (req, res) => {
+router.get("/", verifyUser, async (req, res) => {
   try {
     return res.status(200).json({ data: "verified user", acknowledged: true });
   } catch (err) {
@@ -38,7 +36,7 @@ router.get("/:id/:token", verifyUser, async (req, res) => {
 });
 
 // update new password
-router.patch("/update/:id/:token", verifyUser, async (req, res) => {
+router.patch("/", verifyUser, async (req, res) => {
   try {
     // check for empty data
     if (req.body.newPassword != req.body.confirmNewPassword) {

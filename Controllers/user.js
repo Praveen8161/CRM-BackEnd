@@ -17,7 +17,12 @@ export function newUser(user) {
 
 // get user by token
 export async function getUserByToken(req) {
-  return User.findOne({ token: req.body.token });
+  return User.findOne({ token: req.params.token });
+}
+
+// activate account by activation token
+export function getUserByActToken(req) {
+  return User.findOne({ activationToken: req.params.token });
 }
 
 // get user by Session Token

@@ -55,6 +55,11 @@ const managerSchema = new mongoose.Schema({
       trim: true,
     },
   ],
+  account: {
+    type: String,
+    required: true,
+    default: "inactive",
+  },
 });
 
 export const Manager = mongoose.model("Manager", managerSchema);
