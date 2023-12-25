@@ -40,7 +40,11 @@ router.get("/view", async (req, res) => {
 
     return res
       .status(400)
-      .json({ message: "No Tickets Found", error: "No user Role found" });
+      .json({
+        message: "No Tickets Found",
+        error: "No user Role found",
+        acknowleged: false,
+      });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }
@@ -55,7 +59,9 @@ router.delete("/delete", async (req, res) => {
         .status(201)
         .json({ message: "ticket deleted", data: deleteOneTicket });
     }
-    return res.status(401).json({ error: "permission denied" });
+    return res
+      .status(401)
+      .json({ error: "permission denied", acknowleged: false });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }
@@ -78,7 +84,9 @@ router.post("/create", async (req, res) => {
         acknowleged: true,
       });
     }
-    return res.status(401).json({ error: "permission denied" });
+    return res
+      .status(401)
+      .json({ error: "permission denied", acknowleged: false });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }
