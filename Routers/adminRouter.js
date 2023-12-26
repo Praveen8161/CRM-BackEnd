@@ -21,11 +21,20 @@ const checkAdmin = async (req, res, next) => {
   try {
     // admin exist by email
     const user = await getAdmin(req);
-    if (!user) return res.status(404).json({ error: "user not found" });
+    if (!user)
+      return res
+        .status(404)
+        .json({ error: "user not found", acknowledged: false });
     req.user = user;
     next();
   } catch (err) {
-    res.status(500).json({ error: "Internal Server Error", message: err });
+    res
+      .status(500)
+      .json({
+        error: "Internal Server Error",
+        message: err,
+        acknowledged: false,
+      });
   }
 };
 
@@ -107,7 +116,8 @@ router.post("/signup", async (req, res) => {
     await savedUser.save();
 
     res.status(201).json({
-      message: "Successfully Registered",
+      message: "Successfully Registered go to Login page",
+      acknowledged: true,
       id: savedUser._id,
       email: "Confirmation email is send to your email Address",
     });
@@ -121,7 +131,10 @@ router.post("/login", async (req, res) => {
   try {
     // user exist
     const user = await getAdmin(req);
-    if (!user) return res.status(404).json({ error: "user not found" });
+    if (!user)
+      return res
+        .status(404)
+        .json({ error: "user not found", acknowledged: false });
 
     //validating password
     const validPassword = await bcrypt.compare(
@@ -130,23 +143,29 @@ router.post("/login", async (req, res) => {
     );
 
     if (!validPassword)
-      return res.status(404).json({ error: "Incorrect password" });
+      return res
+        .status(404)
+        .json({ error: "Incorrect password", acknowledged: false });
     if (user.account === "inactive")
       return res.status(404).json({
         error: "verification not completed, verify your account to login",
         active: true,
+        acknowledged: false,
       });
 
     // generate session token
     const sesToken = genearateSessionToken(user._id);
-    if (!sesToken) res.status(404).json({ error: "user not found" });
+    if (!sesToken)
+      res.status(404).json({ error: "user not found", acknowledged: false });
 
     user.sessionToken = sesToken;
     await user.save();
 
-    res
-      .status(200)
-      .json({ data: "logged in successfully", sessionToken: sesToken });
+    res.status(200).json({
+      message: "logged in successfully",
+      sessionToken: sesToken,
+      acknowledged: true,
+    });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }
