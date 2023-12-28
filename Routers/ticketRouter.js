@@ -10,7 +10,7 @@ import {
 const router = express.Router();
 
 // Get tickets all roles
-router.get("/view", async (req, res) => {
+router.post("/view", async (req, res) => {
   try {
     //check user
     if (req.user.role === "Admin" || req.user.role === "Manager") {
@@ -38,13 +38,11 @@ router.get("/view", async (req, res) => {
         .json({ acknowlegment: true, ticktes: userTickets });
     }
 
-    return res
-      .status(400)
-      .json({
-        message: "No Tickets Found",
-        error: "No user Role found",
-        acknowleged: false,
-      });
+    return res.status(400).json({
+      message: "No Tickets Found",
+      error: "No user Role found",
+      acknowleged: false,
+    });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }
@@ -87,6 +85,35 @@ router.post("/create", async (req, res) => {
     return res
       .status(401)
       .json({ error: "permission denied", acknowleged: false });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error", message: err });
+  }
+});
+
+// Resolve ticket -- Admin and Manager
+router.post("/resolve", async (req, res) => {
+  try {
+    if (req.user.role === "User") {
+      return res.status(404).json({
+        error: "Cannot Resolve ticket",
+        acknowleged: false,
+        message: "Permission denied",
+      });
+    }
+    const ticket = await getTicketById(req);
+    if (!ticket)
+      return res
+        .status(404)
+        .json({ acknowleged: false, error: "No Ticket Found" });
+
+    ticket.resolvedBy = req.user._id;
+    ticket.resolvedAt = new Date.now();
+    ticket.resolveComment = req.body.comment || "No Comment";
+    await ticket.save();
+
+    return res
+      .status(201)
+      .json({ acknowleged: true, message: "Ticket Resolved" });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }

@@ -56,9 +56,13 @@ router.patch("/", verifyUser, async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "new password updated", acknowledged: true });
+      .json({ message: "New password updated", acknowledged: true });
   } catch (err) {
-    res.status(500).json({ error: "Internal Server Error", message: err });
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: err,
+      acknowledged: false,
+    });
   }
 });
 

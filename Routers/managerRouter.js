@@ -13,6 +13,7 @@ import { forgotRouter } from "./forgotPasswordRouter.js";
 import { updateRouter } from "./updateNewPassword.js";
 import { ticketRouter } from "./ticketRouter.js";
 import { notificationRouter } from "./notificationRouter.js";
+import { profileRouter } from "./profileUpdate.js";
 
 const router = express.Router();
 
@@ -157,6 +158,10 @@ router.post("/login", async (req, res) => {
       res.status(404).json({ error: "user not found", acknowledged: false });
 
     user.sessionToken = sesToken;
+    const now = Date.now();
+    user.activity = [...user.activity, now];
+    const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+    user.ipAddress = ip;
     await user.save();
 
     res.status(200).json({
@@ -259,5 +264,17 @@ router.use("/ticket", checkManagerBySessionToken, ticketRouter);
 
 // Notification
 router.use("/notify", checkManagerBySessionToken, notificationRouter);
+
+// Update Profile
+router.use("/profile/update", checkManagerBySessionToken, profileRouter);
+
+// Check user
+router.post("/check", checkManagerBySessionToken, async (req, res) => {
+  try {
+    res.status(201).json({ acknowledged: true });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error", message: err });
+  }
+});
 
 export const managerRouter = router;

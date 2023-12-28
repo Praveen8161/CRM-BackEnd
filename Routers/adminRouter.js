@@ -13,6 +13,7 @@ import { ticketRouter } from "./ticketRouter.js";
 import { forgotRouter } from "./forgotPasswordRouter.js";
 import { updateRouter } from "./updateNewPassword.js";
 import { notificationRouter } from "./notificationRouter.js";
+import { profileRouter } from "./profileUpdate.js";
 
 const router = express.Router();
 
@@ -28,13 +29,11 @@ const checkAdmin = async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        error: "Internal Server Error",
-        message: err,
-        acknowledged: false,
-      });
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: err,
+      acknowledged: false,
+    });
   }
 };
 
@@ -159,6 +158,10 @@ router.post("/login", async (req, res) => {
       res.status(404).json({ error: "user not found", acknowledged: false });
 
     user.sessionToken = sesToken;
+    const now = Date.now();
+    user.activity = [...user.activity, now];
+    const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+    user.ipAddress = ip;
     await user.save();
 
     res.status(200).json({
@@ -261,5 +264,17 @@ router.use("/ticket", checkAdminBySessionToken, ticketRouter);
 
 // Notification
 router.use("/notify", checkAdminBySessionToken, notificationRouter);
+
+// Update Profile
+router.use("/profile/update", checkAdminBySessionToken, profileRouter);
+
+// Check user
+router.post("/check", checkAdminBySessionToken, async (req, res) => {
+  try {
+    res.status(201).json({ acknowledged: true });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error", message: err });
+  }
+});
 
 export const adminRouter = router;

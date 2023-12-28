@@ -13,9 +13,9 @@ import { updateRouter } from "./updateNewPassword.js";
 import { ticketRouter } from "./ticketRouter.js";
 import { forgotRouter } from "./forgotPasswordRouter.js";
 import { notificationRouter } from "./notificationRouter.js";
+import { profileRouter } from "./profileUpdate.js";
 
 const router = express.Router();
-
 // middleware function for forgot password
 const checkUser = async (req, res, next) => {
   try {
@@ -52,13 +52,11 @@ const checkUserByToken = async (req, res, next) => {
     req.id = id;
     next();
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        error: "Internal Server Error",
-        message: err,
-        acknowledged: false,
-      });
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: err,
+      acknowledged: false,
+    });
   }
 };
 
@@ -174,6 +172,16 @@ router.post("/login", async (req, res) => {
       res.status(404).json({ error: "user not found", acknowledged: false });
 
     user.sessionToken = sesToken;
+    const now = Date.now();
+    user.activity = [...user.activity, now];
+    const ip = (
+      req.headers["cf-connecting-ip"] ||
+      req.headers["x-real-ip"] ||
+      req.headers["x-forwarded-for"] ||
+      req.socket.remoteAddress ||
+      ""
+    ).split(",");
+    user.ipAddress = ips[0].trim();
     await user.save();
 
     res.status(200).json({
@@ -276,5 +284,31 @@ router.use("/ticket", checkUserBySessionToken, ticketRouter);
 
 // notification
 router.use("/notify", notificationRouter);
+
+// Update Profile
+router.use("/profile/update", checkUserBySessionToken, profileRouter);
+
+// Check user
+router.post("/check", checkUserBySessionToken, async (req, res) => {
+  try {
+    res
+      .status(201)
+      .json({ acknowledged: true, first_name: req.user.first_name });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error", message: err });
+  }
+});
+
+// get user data by session storage
+router.post("/getdata", async (req, res) => {
+  try {
+  } catch (err) {
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: err,
+      acknowledged: false,
+    });
+  }
+});
 
 export const userRouter = router;

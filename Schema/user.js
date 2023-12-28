@@ -78,6 +78,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     default: "inactive",
   },
+  ipAddress: {
+    type: String,
+    trim: true,
+  },
 });
 
 export const User = mongoose.model("User", userSchema);
