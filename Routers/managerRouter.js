@@ -14,6 +14,7 @@ import { updateRouter } from "./updateNewPassword.js";
 import { ticketRouter } from "./ticketRouter.js";
 import { notificationRouter } from "./notificationRouter.js";
 import { profileRouter } from "./profileUpdate.js";
+import { serviceRouter } from "./serviceRouter.js";
 
 const router = express.Router();
 
@@ -71,7 +72,7 @@ const checkManagerBySessionToken = async (req, res, next) => {
 async function activationMail(email) {
   const actToken = genearateActiveToken(email);
 
-  const activeMail = await sendActivationMail(email, actToken, manager);
+  const activeMail = await sendActivationMail(email, actToken, "manager");
 
   if (!activeMail)
     return {
@@ -270,6 +271,9 @@ router.use("/notify", checkManagerBySessionToken, notificationRouter);
 
 // Update Profile
 router.use("/profile/update", checkManagerBySessionToken, profileRouter);
+
+// Service
+router.use("/service", checkManagerBySessionToken, serviceRouter);
 
 // Check user
 router.post("/check", checkManagerBySessionToken, async (req, res) => {

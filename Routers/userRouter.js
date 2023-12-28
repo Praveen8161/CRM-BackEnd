@@ -14,6 +14,7 @@ import { ticketRouter } from "./ticketRouter.js";
 import { forgotRouter } from "./forgotPasswordRouter.js";
 import { notificationRouter } from "./notificationRouter.js";
 import { profileRouter } from "./profileUpdate.js";
+import { serviceRouter } from "./serviceRouter.js";
 
 const router = express.Router();
 // middleware function for forgot password
@@ -77,7 +78,7 @@ const checkUserBySessionToken = async (req, res, next) => {
 async function activationMail(email) {
   const actToken = genearateActiveToken(email);
 
-  const activeMail = await sendActivationMail(email, actToken, user);
+  const activeMail = await sendActivationMail(email, actToken, "user");
 
   if (!activeMail)
     return {
@@ -281,6 +282,9 @@ router.use("/notify", notificationRouter);
 
 // Update Profile
 router.use("/profile/update", checkUserBySessionToken, profileRouter);
+
+// Service
+router.use("/service", checkUserBySessionToken, serviceRouter);
 
 // Check user
 router.post("/check", checkUserBySessionToken, async (req, res) => {

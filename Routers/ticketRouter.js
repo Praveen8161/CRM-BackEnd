@@ -60,13 +60,23 @@ router.delete("/delete", async (req, res) => {
       const deleteOneTicket = await deleteTicket(req);
       return res
         .status(201)
-        .json({ message: "ticket deleted", data: deleteOneTicket });
+        .json({
+          message: "ticket deleted",
+          data: deleteOneTicket,
+          acknowledged: true,
+        });
     }
     return res
       .status(401)
       .json({ error: "permission denied", acknowledged: false });
   } catch (err) {
-    res.status(500).json({ error: "Internal Server Error", message: err });
+    res
+      .status(500)
+      .json({
+        error: "Internal Server Error",
+        message: err,
+        acknowledged: false,
+      });
   }
 });
 

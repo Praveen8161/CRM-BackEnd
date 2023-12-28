@@ -25,9 +25,15 @@ export function getUserByActToken(req) {
   return User.findOne({ activationToken: req.params.token });
 }
 
-// get user by Session Token
+// get user by Session Token with notification populate
 export async function getUserBySessionToken(req) {
   return User.findOne({ sessionToken: req.body.sessionToken }).populate(
     "notification.data"
+  );
+}
+
+export async function getUserServices(req) {
+  return User.findOne({ sessionToken: req.body.sessionToken }).populate(
+    "services"
   );
 }

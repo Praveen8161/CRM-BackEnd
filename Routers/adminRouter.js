@@ -14,6 +14,7 @@ import { forgotRouter } from "./forgotPasswordRouter.js";
 import { updateRouter } from "./updateNewPassword.js";
 import { notificationRouter } from "./notificationRouter.js";
 import { profileRouter } from "./profileUpdate.js";
+import { serviceRouter } from "./serviceRouter.js";
 
 const router = express.Router();
 
@@ -58,12 +59,19 @@ const checkUserByToken = async (req, res, next) => {
 const checkAdminBySessionToken = async (req, res, next) => {
   try {
     // user exist
-    const user = await getUserBySessionToken(req);
-    if (!user) return res.status(404).json({ error: "user not found" });
+    const user = await getAdminBySessionToken(req);
+    if (!user)
+      return res
+        .status(404)
+        .json({ error: "user not found", acknowledged: false });
     req.user = user;
     next();
   } catch (err) {
-    res.status(500).json({ error: "Internal Server Error", message: err });
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: err,
+      acknowledged: false,
+    });
   }
 };
 
@@ -71,7 +79,7 @@ const checkAdminBySessionToken = async (req, res, next) => {
 async function activationMail(email) {
   const actToken = genearateActiveToken(email);
 
-  const activeMail = await sendActivationMail(email, actToken, admin);
+  const activeMail = await sendActivationMail(email, actToken, "admin");
 
   if (!activeMail)
     return {
@@ -114,7 +122,7 @@ router.post("/signup", async (req, res) => {
     savedUser.activationToken = actMailSent.actToken;
     await savedUser.save();
 
-    res.status(201).json({
+    return res.status(201).json({
       message:
         "Confirmation email is send to your email Address go to Login page",
       acknowledged: true,
@@ -122,7 +130,11 @@ router.post("/signup", async (req, res) => {
       email: "Confirmation email is send to your email Address",
     });
   } catch (err) {
-    res.status(500).json({ error: "Internal Server Error", message: err });
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: err,
+      acknowledged: false,
+    });
   }
 });
 
@@ -267,6 +279,9 @@ router.use("/notify", checkAdminBySessionToken, notificationRouter);
 
 // Update Profile
 router.use("/profile/update", checkAdminBySessionToken, profileRouter);
+
+// Service
+router.use("/service", checkAdminBySessionToken, serviceRouter);
 
 // Check user
 router.post("/check", checkAdminBySessionToken, async (req, res) => {

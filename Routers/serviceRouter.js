@@ -1,16 +1,22 @@
 import express from "express";
 import {
+  changeServices,
   createService,
   deleteService,
+  getAllServices,
   getServiceCurr,
   getServiceOld,
 } from "../Controllers/service.js";
-import { getAllUser } from "../Controllers/user.js";
+import { getAllUser, getUserServices } from "../Controllers/user.js";
 const router = express.Router();
 
 // Create Service
 router.post("/createservice", async (req, res) => {
   try {
+    if (req.user.role !== "Admin")
+      return res
+        .status(400)
+        .json({ acknowledged: false, error: " Permission denied" });
     // create new notification
     const newService = await createService(req);
     if (!newService)
@@ -19,7 +25,13 @@ router.post("/createservice", async (req, res) => {
         acknowledged: false,
       });
 
-    return res.status(201).json({ acknowledged: true, data: newService });
+    return res
+      .status(201)
+      .json({
+        acknowledged: true,
+        data: newService,
+        message: "New Service created",
+      });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }
@@ -65,7 +77,7 @@ router.delete("/deleteservice", async (req, res) => {
 });
 
 // Get Service with User Details
-router.get("/getservice", async (req, res) => {
+router.post("/getservice", async (req, res) => {
   try {
     if (req.body.user === "currentUser") {
       const service = await getServiceCurr(req);
@@ -94,13 +106,41 @@ router.get("/getservice", async (req, res) => {
 // Change Service for Users
 router.patch("/changeservice", async (req, res) => {
   try {
+    if (req.user.role !== "User")
+      return res
+        .status(400)
+        .json({ acknowledged: false, error: "Permission denied" });
     const changes = await changeServices(req);
-    if (!changes)
+    if (!changes || !changes.acknowledged)
       return res
         .status(400)
         .json({ error: "Error adding data", acknowledged: false });
 
     res.status(200).json({ data: changes, acknowledged: true });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error", message: err });
+  }
+});
+
+// get services
+router.post("/getservices", async (req, res) => {
+  try {
+    const allServices = await getAllServices();
+    if (req.user.role !== "User") {
+      return res.status(201).json({ acknowledged: true, allServices });
+    }
+
+    const userService = await getUserServices(req);
+    if (!userService || userService.length < 1)
+      return res
+        .status(400)
+        .json({ error: "No data Found", acknowledged: false });
+
+    res.status(200).json({
+      userService: userService.services,
+      allServices,
+      acknowledged: true,
+    });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }
