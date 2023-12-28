@@ -22,5 +22,8 @@ export function deleteTicket(req) {
 
 // create new Ticket
 export function createNewTicket(req) {
-  return new Ticket(req.body).save();
+  return new Ticket({
+    ...req.body,
+    createdBy: req.user._id,
+  }).save();
 }

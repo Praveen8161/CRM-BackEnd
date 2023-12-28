@@ -13,35 +13,40 @@ const router = express.Router();
 router.post("/view", async (req, res) => {
   try {
     //check user
-    if (req.user.role === "Admin" || req.user.role === "Manager") {
+    if (req.user.role !== "User") {
       // get all tickets
       const allTickets = await getAllTickets();
 
       if (!allTickets || allTickets.length < 1)
-        return res
-          .status(404)
-          .json({ message: "No Tickets Found", error: "404 no tickets found" });
+        return res.status(404).json({
+          message: "No Tickets Found",
+          error: "No Tickets found",
+          acknowledged: false,
+        });
 
-      return res.status(201).json({ acknowlegment: true, ticktes: allTickets });
+      return res.status(201).json({ acknowledged: true, tickets: allTickets });
     }
 
     if (req.user.role === "User") {
       // get only user tickets
       const userTickets = await getUserTickets(req);
       if (!userTickets || userTickets.length < 1)
-        return res
-          .status(404)
-          .json({ message: "No Tickets Found", error: "404 no tickets found" });
+        return res.status(404).json({
+          error: "No tickets found",
+          acknowledged: false,
+        });
 
-      return res
-        .status(201)
-        .json({ acknowlegment: true, ticktes: userTickets });
+      return res.status(201).json({
+        acknowledged: true,
+        tickets: userTickets,
+        message: "Tickets Found",
+      });
     }
 
     return res.status(400).json({
       message: "No Tickets Found",
       error: "No user Role found",
-      acknowleged: false,
+      acknowledged: false,
     });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
@@ -59,7 +64,7 @@ router.delete("/delete", async (req, res) => {
     }
     return res
       .status(401)
-      .json({ error: "permission denied", acknowleged: false });
+      .json({ error: "permission denied", acknowledged: false });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }
@@ -74,17 +79,17 @@ router.post("/create", async (req, res) => {
       if (!newTicket)
         return res
           .status(404)
-          .json({ error: "Cannot create ticket", acknowleged: false });
+          .json({ error: "Cannot create ticket", acknowledged: false });
 
       return res.status(201).json({
         message: "Ticket Created",
         data: newTicket,
-        acknowleged: true,
+        acknowledged: true,
       });
     }
     return res
       .status(401)
-      .json({ error: "permission denied", acknowleged: false });
+      .json({ error: "permission denied", acknowledged: false });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }
@@ -96,26 +101,31 @@ router.post("/resolve", async (req, res) => {
     if (req.user.role === "User") {
       return res.status(404).json({
         error: "Cannot Resolve ticket",
-        acknowleged: false,
+        acknowledged: false,
         message: "Permission denied",
       });
     }
+
     const ticket = await getTicketById(req);
     if (!ticket)
       return res
         .status(404)
-        .json({ acknowleged: false, error: "No Ticket Found" });
+        .json({ acknowledged: false, error: "No Ticket Found" });
 
     ticket.resolvedBy = req.user._id;
-    ticket.resolvedAt = new Date.now();
+    ticket.resolvedAt = Date.now();
     ticket.resolveComment = req.body.comment || "No Comment";
     await ticket.save();
 
     return res
       .status(201)
-      .json({ acknowleged: true, message: "Ticket Resolved" });
+      .json({ acknowledged: true, message: "Ticket Resolved" });
   } catch (err) {
-    res.status(500).json({ error: "Internal Server Error", message: err });
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: err,
+      acknowledged: false,
+    });
   }
 });
 
@@ -124,16 +134,17 @@ router.post("/resolve", async (req, res) => {
   try {
     if (req.user.role === "User") {
       return res.status(404).json({
-        error: "Cannot Resolve ticket",
-        acknowleged: false,
-        message: "Permission denied",
+        error: "Permission denied",
+        acknowledged: false,
+        m,
       });
     }
+    console.log(req.body);
     const ticket = await getTicketById(req);
     if (!ticket)
       return res
         .status(404)
-        .json({ acknowleged: false, error: "No Ticket Found" });
+        .json({ acknowledged: false, error: "No Ticket Found" });
 
     ticket.resolvedBy = req.user._id;
     ticket.resolvedAt = new Date.now();
@@ -142,7 +153,7 @@ router.post("/resolve", async (req, res) => {
 
     return res
       .status(201)
-      .json({ acknowleged: true, message: "Ticket Resolved" });
+      .json({ acknowledged: true, message: "Ticket Resolved" });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }

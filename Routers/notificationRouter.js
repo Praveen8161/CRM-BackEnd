@@ -2,12 +2,48 @@ import express from "express";
 import {
   createNotify,
   deleteNotify,
+  getAllNotify,
   getNotify,
   getNotifyByUser,
 } from "../Controllers/notification.js";
 import { getAllUser } from "../Controllers/user.js";
 
 const router = express.Router();
+
+// Create notification
+router.post("/createnotify", async (req, res) => {
+  try {
+    // create new notification
+    const newNotify = await createNotify(req);
+    if (!newNotify)
+      return res.status(404).json({
+        error: "Cannot create a new notification",
+        acknowledged: false,
+      });
+
+    // get all users
+    const users = await getAllUser();
+    if (users.length < 1 || !users)
+      return res
+        .status(404)
+        .json({ error: "No users Found", acknowledged: false });
+
+    const addNotify = [{ data: newNotify._id }];
+    for (let val of users) {
+      val.notification = [...val.notification, addNotify];
+
+      await val.save();
+    }
+
+    return res.status(201).json({ acknowledged: true, data: newNotify });
+  } catch (err) {
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: err,
+      acknowledged: false,
+    });
+  }
+});
 
 // Get notification for user
 router.post("/usernotify", async (req, res) => {
@@ -22,6 +58,27 @@ router.post("/usernotify", async (req, res) => {
     return res
       .status(201)
       .json({ acknowledged: true, notifications: req.user.notification });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error", message: err });
+  }
+});
+
+router.post("/allnotify", async (req, res) => {
+  try {
+    // user exist
+    if (req.user.role === "User")
+      return res
+        .status(404)
+        .json({ error: "Permission denied", acknowledged: false });
+
+    const notify = await getAllNotify();
+    console.log(notify);
+    if (notify.length < 1)
+      return res
+        .status(404)
+        .json({ error: "No notification found", acknowledged: false });
+
+    return res.status(201).json({ acknowledged: true, notifications: notify });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }
@@ -70,37 +127,6 @@ router.delete("/notifydelete", async (req, res) => {
     return res
       .status(201)
       .json({ acknowledged: true, message: "Notification is deleted" });
-  } catch (err) {
-    res.status(500).json({ error: "Internal Server Error", message: err });
-  }
-});
-
-// Create notification
-router.post("/createnotify", async (req, res) => {
-  try {
-    // create new notification
-    const newNotify = await createNotify(req);
-    if (!newNotify)
-      return res.status(404).json({
-        error: "Cannot create a new notification",
-        acknowledged: false,
-      });
-    // get all users
-    const users = await getAllUser();
-    if (users.length < 1 || !users)
-      return res
-        .status(404)
-        .json({ error: "No users Found", acknowledged: false });
-
-    const addNotify = [{ data: newNotify._id, readStatus: false }];
-
-    // Adding the new notification to all the users
-    for (let val of users) {
-      val.notification.push(addNotify);
-      await val.save();
-    }
-
-    return res.status(201).json({ acknowledged: true, data: newNotify });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }

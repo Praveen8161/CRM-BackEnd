@@ -7,14 +7,14 @@ const notificationSchema = new mongoose.Schema({
     trim: true,
     required: true,
     minLength: [2, "Name should have at least 2 characters"],
-    maxLength: [25, "Name should have at most 30 characters"],
+    maxLength: [25, "Name should have at most 25 characters"],
   },
   message: {
     type: String,
     required: true,
     trim: true,
-    minLength: [8, "Name should have at least 2 characters"],
-    maxLength: [50, "Name should have at most 30 characters"],
+    minLength: [2, "Name should have at least 2 characters"],
+    maxLength: [50, "Name should have at most 50 characters"],
   },
   createdAt: {
     type: Date,
@@ -23,13 +23,7 @@ const notificationSchema = new mongoose.Schema({
   },
   createdBy: {
     type: ObjectId,
-    refPath: "onModel",
     trim: true,
-  },
-  onModel: {
-    type: String,
-    enum: ["Manager", "Admin"],
-    required: true,
   },
 });
 

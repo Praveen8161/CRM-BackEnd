@@ -77,7 +77,7 @@ const checkUserBySessionToken = async (req, res, next) => {
 async function activationMail(email) {
   const actToken = genearateActiveToken(email);
 
-  const activeMail = await sendActivationMail(email, actToken);
+  const activeMail = await sendActivationMail(email, actToken, user);
 
   if (!activeMail)
     return {
@@ -124,7 +124,8 @@ router.post("/signup", async (req, res) => {
     await savedUser.save();
 
     return res.status(201).json({
-      message: "Successfully Registered go to Login page",
+      message:
+        "Confirmation email is send to your email Address go to Login page",
       acknowledged: true,
       id: savedUser._id,
       email: "Confirmation email is send to your email Address",
@@ -174,14 +175,7 @@ router.post("/login", async (req, res) => {
     user.sessionToken = sesToken;
     const now = Date.now();
     user.activity = [...user.activity, now];
-    const ip = (
-      req.headers["cf-connecting-ip"] ||
-      req.headers["x-real-ip"] ||
-      req.headers["x-forwarded-for"] ||
-      req.socket.remoteAddress ||
-      ""
-    ).split(",");
-    user.ipAddress = ips[0].trim();
+
     await user.save();
 
     res.status(200).json({
@@ -291,23 +285,9 @@ router.use("/profile/update", checkUserBySessionToken, profileRouter);
 // Check user
 router.post("/check", checkUserBySessionToken, async (req, res) => {
   try {
-    res
-      .status(201)
-      .json({ acknowledged: true, first_name: req.user.first_name });
+    res.status(201).json({ acknowledged: true, user: req.user });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
-  }
-});
-
-// get user data by session storage
-router.post("/getdata", async (req, res) => {
-  try {
-  } catch (err) {
-    res.status(500).json({
-      error: "Internal Server Error",
-      message: err,
-      acknowledged: false,
-    });
   }
 });
 

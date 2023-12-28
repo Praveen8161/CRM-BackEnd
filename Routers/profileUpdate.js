@@ -6,7 +6,7 @@ router.post("/", async (req, res) => {
   try {
     req.user.first_name = req.body.first_name;
     req.user.last_name = req.body.last_name;
-    re.user.phoneNumber = req.body.phoneNumber;
+    req.user.phoneNumber = req.body.phoneNumber;
     await req.user.save();
 
     return res.status(200).json({

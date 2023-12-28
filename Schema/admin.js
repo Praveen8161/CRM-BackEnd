@@ -60,10 +60,6 @@ const adminSchema = new mongoose.Schema({
     required: true,
     default: "inactive",
   },
-  ipAddress: {
-    type: String,
-    trim: true,
-  },
 });
 
 export const Admin = mongoose.model("Admin", adminSchema);

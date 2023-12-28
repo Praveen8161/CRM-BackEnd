@@ -71,7 +71,7 @@ const checkAdminBySessionToken = async (req, res, next) => {
 async function activationMail(email) {
   const actToken = genearateActiveToken(email);
 
-  const activeMail = await sendActivationMail(email, actToken);
+  const activeMail = await sendActivationMail(email, actToken, admin);
 
   if (!activeMail)
     return {
@@ -115,7 +115,8 @@ router.post("/signup", async (req, res) => {
     await savedUser.save();
 
     res.status(201).json({
-      message: "Successfully Registered go to Login page",
+      message:
+        "Confirmation email is send to your email Address go to Login page",
       acknowledged: true,
       id: savedUser._id,
       email: "Confirmation email is send to your email Address",
@@ -160,8 +161,7 @@ router.post("/login", async (req, res) => {
     user.sessionToken = sesToken;
     const now = Date.now();
     user.activity = [...user.activity, now];
-    const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
-    user.ipAddress = ip;
+
     await user.save();
 
     res.status(200).json({
@@ -271,7 +271,7 @@ router.use("/profile/update", checkAdminBySessionToken, profileRouter);
 // Check user
 router.post("/check", checkAdminBySessionToken, async (req, res) => {
   try {
-    res.status(201).json({ acknowledged: true });
+    res.status(201).json({ acknowledged: true, user: req.user });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }

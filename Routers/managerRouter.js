@@ -71,7 +71,7 @@ const checkManagerBySessionToken = async (req, res, next) => {
 async function activationMail(email) {
   const actToken = genearateActiveToken(email);
 
-  const activeMail = await sendActivationMail(email, actToken);
+  const activeMail = await sendActivationMail(email, actToken, manager);
 
   if (!activeMail)
     return {
@@ -115,7 +115,8 @@ router.post("/signup", async (req, res) => {
     await savedUser.save();
 
     return res.status(201).json({
-      message: "Successfully Registered go to Login page",
+      message:
+        "Confirmation email is send to your email Address go to Login page",
       acknowledged: true,
       id: savedUser._id,
       email: "Confirmation email is send to your email Address",
@@ -158,10 +159,11 @@ router.post("/login", async (req, res) => {
       res.status(404).json({ error: "user not found", acknowledged: false });
 
     user.sessionToken = sesToken;
+
     const now = Date.now();
+
     user.activity = [...user.activity, now];
-    const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
-    user.ipAddress = ip;
+
     await user.save();
 
     res.status(200).json({
@@ -211,6 +213,7 @@ router.get("/signup/activate/:token", async (req, res) => {
   try {
     // user exist
     const user = await getManagerByActToken(req);
+
     if (!user) return res.status(404).json({ error: "user not found" });
     if (user.account === "active") {
       user.activationToken = "";
@@ -271,7 +274,7 @@ router.use("/profile/update", checkManagerBySessionToken, profileRouter);
 // Check user
 router.post("/check", checkManagerBySessionToken, async (req, res) => {
   try {
-    res.status(201).json({ acknowledged: true });
+    res.status(201).json({ acknowledged: true, user: req.user });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }

@@ -17,7 +17,7 @@ const ticketSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    minLength: [5, "Name should have at least 5 characters"],
+    minLength: [2, "Name should have at least 5 characters"],
     maxLength: [150, "Name should have at most 150 characters"],
   },
   ticketNumber: {
@@ -36,6 +36,7 @@ const ticketSchema = new mongoose.Schema({
   },
   createdBy: {
     type: ObjectId,
+    required: true,
     ref: "User",
     trim: true,
   },

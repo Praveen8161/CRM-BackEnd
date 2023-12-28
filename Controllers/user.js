@@ -27,5 +27,7 @@ export function getUserByActToken(req) {
 
 // get user by Session Token
 export async function getUserBySessionToken(req) {
-  return User.findOne({ sessionToken: req.body.sessionToken });
+  return User.findOne({ sessionToken: req.body.sessionToken }).populate(
+    "notification.data"
+  );
 }

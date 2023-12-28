@@ -51,7 +51,8 @@ const userSchema = new mongoose.Schema({
   },
   activity: [
     {
-      time: { type: String, trim: true },
+      type: String,
+      trim: true,
     },
   ],
   notification: [
@@ -77,10 +78,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     default: "inactive",
-  },
-  ipAddress: {
-    type: String,
-    trim: true,
   },
 });
 

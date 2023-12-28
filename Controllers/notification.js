@@ -8,6 +8,11 @@ export function getNotifyByUser(req) {
   );
 }
 
+// Get alll Notification
+export function getAllNotify() {
+  return Notification.find();
+}
+
 // Delete Notification Document
 export function deleteNotify(req) {
   return Notification.deleteOne({ _id: req.body.notifyId });
@@ -15,7 +20,11 @@ export function deleteNotify(req) {
 
 // Create Notification
 export function createNotify(req) {
-  return new Notification(req.body).save();
+  return new Notification({
+    notificationName: req.body.notificationName,
+    message: req.body.message,
+    createdBy: req.user._id,
+  }).save();
 }
 
 // Get Notification

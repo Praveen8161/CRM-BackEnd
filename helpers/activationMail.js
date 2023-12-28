@@ -2,7 +2,7 @@ import nodemailer from "nodemailer";
 import { backendURL } from "./urls.js";
 
 // send password reset mail
-export async function sendActivationMail(email, actToken) {
+export async function sendActivationMail(email, actToken, role) {
   let transport = nodemailer.createTransport({
     service: "gmail",
     host: "smtp:gmail.com",
@@ -22,7 +22,7 @@ export async function sendActivationMail(email, actToken) {
         <p>In order to complete your account creation click the link below to verify your email</p>
         <p>The link will be expired in 2 days</p>
         <div style="text-align: center;">
-          <a href="${backendURL}/user/signup/activate/${actToken}" target="_blank" style="background-color: #4CAF50; color: white; padding: 14px 25px; text-align: center; text-decoration: none; display: inline-block; border-radius: 15px;">
+          <a href="${backendURL}/${role}/signup/activate/${actToken}" target="_blank" style="background-color: #4CAF50; color: white; padding: 14px 25px; text-align: center; text-decoration: none; display: inline-block; border-radius: 15px;">
             Confirm Email
           </a>
         </div>`,

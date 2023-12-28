@@ -60,10 +60,6 @@ const managerSchema = new mongoose.Schema({
     required: true,
     default: "inactive",
   },
-  ipAddress: {
-    type: String,
-    trim: true,
-  },
 });
 
 export const Manager = mongoose.model("Manager", managerSchema);
