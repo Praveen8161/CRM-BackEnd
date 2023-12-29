@@ -77,32 +77,32 @@ router.delete("/deleteservice", async (req, res) => {
   }
 });
 
-// Get Service with User Details
-router.post("/getservice", async (req, res) => {
-  try {
-    if (req.body.user === "currentUser") {
-      const service = await getServiceCurr(req);
-      if (!service)
-        return res.status(404).json({
-          error: "No Services found",
-          acknowledged: false,
-        });
+// // Get Service with User Details
+// router.post("/getservice", async (req, res) => {
+//   try {
+//     if (req.body.user === "currentUser") {
+//       const service = await getServiceCurr(req);
+//       if (!service)
+//         return res.status(404).json({
+//           error: "No Services found",
+//           acknowledged: false,
+//         });
 
-      return res.status(201).json({ acknowledged: true, data: service });
-    } else {
-      const service = await getServiceOld(req);
-      if (!service)
-        return res.status(404).json({
-          error: "No Services found",
-          acknowledged: false,
-        });
+//       return res.status(201).json({ acknowledged: true, data: service });
+//     } else {
+//       const service = await getServiceOld(req);
+//       if (!service)
+//         return res.status(404).json({
+//           error: "No Services found",
+//           acknowledged: false,
+//         });
 
-      return res.status(201).json({ acknowledged: true, data: service });
-    }
-  } catch (err) {
-    res.status(500).json({ error: "Internal Server Error", message: err });
-  }
-});
+//       return res.status(201).json({ acknowledged: true, data: service });
+//     }
+//   } catch (err) {
+//     res.status(500).json({ error: "Internal Server Error", message: err });
+//   }
+// });
 
 // Change Service for Users
 router.patch("/changeservice", async (req, res) => {
@@ -112,12 +112,16 @@ router.patch("/changeservice", async (req, res) => {
         .status(400)
         .json({ acknowledged: false, error: "Permission denied" });
     const changes = await changeServices(req);
-    if (!changes || !changes.acknowledged)
+    if (!changes.acknowledged)
       return res
         .status(400)
-        .json({ error: "Error adding data", acknowledged: false });
+        .json({ error: changes.error, acknowledged: false });
 
-    res.status(200).json({ data: changes, acknowledged: true });
+    res.status(200).json({
+      data: changes.data,
+      acknowledged: true,
+      message: "Service changed Successfully",
+    });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }
@@ -139,7 +143,7 @@ router.post("/getservices", async (req, res) => {
         .json({ error: "No data Found", acknowledged: false });
 
     res.status(200).json({
-      userService: userService.services,
+      userSer: userService.services,
       allServices,
       acknowledged: true,
     });

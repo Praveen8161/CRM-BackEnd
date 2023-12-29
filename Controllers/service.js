@@ -34,49 +34,62 @@ export async function changeServices(req) {
     const user = await getUserBySessionToken(req);
     if (!user) return { error: "Data not found", acknowledged: false };
 
-    // Remove user data from old services
-    for (let val of user.services) {
-      const service = await Service.findOne({ _id: val });
-      if (!service) return { error: "Data not found", acknowledged: false };
+    // Remove user data from old services if the user have any prior service
+    if (user.services || user.services.length > 0) {
+      for (let val of user.services) {
+        const ser = await Service.findOne({ _id: val });
+        if (!ser) return { error: "Data not found", acknowledged: false };
 
-      // add user data to Old user array
-      if (!service.oldUser.includes(user._id)) {
-        service.oldUser = [...service.oldUser, user._id];
+        // add user data to Old user array if it's already exist
+        if (!ser.oldUser.includes(user._id) && ser.oldUser) {
+          ser.oldUser = [...ser.oldUser, user._id];
+        } else if (!ser.oldUser) {
+          ser.oldUser = [user._id];
+        }
+
+        // remove user data from Current User Array if it's exist
+        if (
+          ser.currentUser.includes(user._id) &&
+          ser.currentUser.length > 0 &&
+          ser.currentUser
+        ) {
+          ser.currentUser = ser.currentUser.filter((curr) => {
+            return curr !== user._id;
+          });
+        }
+
+        // saving service
+        await ser.save();
       }
-
-      // remove user data from Current User Array
-      if (
-        service.currentUser.includes(user._id) &&
-        service.currentUser.length > 0
-      ) {
-        service.currentUser = service.currentUser.filter((curr) => {
-          return curr !== user._id;
-        });
-      }
-
-      // saving service
-      await service.save();
     }
 
-    // Add user to the new services
-    for (let val of req.body.services) {
-      const service = await Service.findOne({ _id: val });
-      if (!service) return { error: "Data not found", acknowledged: false };
+    // Add user to the new services which is in req body if there is any req made
+    if (req.body.services.length > 0) {
+      for (let val of req.body.services) {
+        const newSer = await Service.findOne({ _id: val });
+        if (!newSer) return { error: "Data not found", acknowledged: false };
 
-      // remove user data from oldUser Array
-      if (service.oldUser.includes(user._id) && service.oldUser.length > 0) {
-        service.oldUser = service.oldUser.filter((old) => {
-          return old !== user._id;
-        });
+        // remove user data from oldUser Array from SERVICES
+        if (
+          newSer.oldUser.includes(user._id) &&
+          newSer.oldUser.length > 0 &&
+          newSer.oldUser
+        ) {
+          newSer.oldUser = newSer.oldUser.filter((old) => {
+            return old !== user._id;
+          });
+        }
+
+        // add user data to current user array
+        if (!newSer.currentUser.includes(user._id) && newSer.currentUser) {
+          newSer.currentUser = [...newSer.currentUser, user._id];
+        } else if (!newSer.currentUser) {
+          newSer.currentUser = [user._id];
+        }
+
+        // saving service
+        await newSer.save();
       }
-
-      // add user data to current user array
-      if (!service.currentUser.includes(user._id)) {
-        service.currentUser = [...service.currentUser, user._id];
-      }
-
-      // saving service
-      await service.save();
     }
 
     // adding the service to the user database
@@ -85,7 +98,11 @@ export async function changeServices(req) {
     // saving User data
     await user.save();
 
-    return "Service changed Successfully";
+    return {
+      message: "Service changed Successfully",
+      acknowledged: true,
+      data: user.services,
+    };
   } catch (err) {
     console.log(err);
   }

@@ -6,8 +6,8 @@ const serviceSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    minLength: [8, "Name should have at least 2 characters"],
-    maxLength: [50, "Name should have at most 30 characters"],
+    minLength: [1, "Name should have at least 1 characters"],
+    maxLength: [100, "Name should have at most 100 characters"],
   },
   createdAt: {
     type: Date,
