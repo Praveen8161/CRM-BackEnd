@@ -77,33 +77,6 @@ router.delete("/deleteservice", async (req, res) => {
   }
 });
 
-// // Get Service with User Details
-// router.post("/getservice", async (req, res) => {
-//   try {
-//     if (req.body.user === "currentUser") {
-//       const service = await getServiceCurr(req);
-//       if (!service)
-//         return res.status(404).json({
-//           error: "No Services found",
-//           acknowledged: false,
-//         });
-
-//       return res.status(201).json({ acknowledged: true, data: service });
-//     } else {
-//       const service = await getServiceOld(req);
-//       if (!service)
-//         return res.status(404).json({
-//           error: "No Services found",
-//           acknowledged: false,
-//         });
-
-//       return res.status(201).json({ acknowledged: true, data: service });
-//     }
-//   } catch (err) {
-//     res.status(500).json({ error: "Internal Server Error", message: err });
-//   }
-// });
-
 // Change Service for Users
 router.patch("/changeservice", async (req, res) => {
   try {

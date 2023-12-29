@@ -41,21 +41,22 @@ export async function changeServices(req) {
         if (!ser) return { error: "Data not found", acknowledged: false };
 
         // add user data to Old user array if it's already exist
-        if (!ser.oldUser.includes(user._id) && ser.oldUser) {
-          ser.oldUser = [...ser.oldUser, user._id];
-        } else if (!ser.oldUser) {
+        if (
+          !ser.oldUser.includes(user._id) &&
+          ser.oldUser &&
+          ser.oldUser.length > 0
+        ) {
+          ser.oldUser = [...new Set([...ser.oldUser, user._id])];
+        } else if (!ser.oldUser || ser.oldUser.length < 1) {
           ser.oldUser = [user._id];
         }
 
         // remove user data from Current User Array if it's exist
-        if (
-          ser.currentUser.includes(user._id) &&
-          ser.currentUser.length > 0 &&
-          ser.currentUser
-        ) {
+        if (ser.currentUser.length > 0) {
           ser.currentUser = ser.currentUser.filter((curr) => {
-            return curr !== user._id;
+            return curr.toString() !== user._id.toString();
           });
+          ser.currentUser = [...new Set(ser.currentUser)];
         }
 
         // saving service
@@ -82,7 +83,7 @@ export async function changeServices(req) {
 
         // add user data to current user array
         if (!newSer.currentUser.includes(user._id) && newSer.currentUser) {
-          newSer.currentUser = [...newSer.currentUser, user._id];
+          newSer.currentUser = [...new Set([...newSer.currentUser, user._id])];
         } else if (!newSer.currentUser) {
           newSer.currentUser = [user._id];
         }
@@ -93,7 +94,7 @@ export async function changeServices(req) {
     }
 
     // adding the service to the user database
-    user.services = [...req.body.services];
+    user.services = [...new Set([...req.body.services])];
 
     // saving User data
     await user.save();

@@ -16,7 +16,7 @@ router.post("/alldata", async (req, res) => {
       AllSer = [];
     }
 
-    if (req.user.role === "user") {
+    if (req.user.role === "User") {
       // All the tickets for users
       let allUserTic = await getAllUserTicket(req);
 
@@ -44,7 +44,7 @@ router.post("/alldata", async (req, res) => {
       });
     }
 
-    if (req.user.role !== "user") {
+    if (req.user.role !== "User") {
       // Get All the user
       const allUser = await getAllUser();
 
