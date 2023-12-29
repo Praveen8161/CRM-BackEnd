@@ -25,16 +25,13 @@ router.post("/createnotify", async (req, res) => {
 
     // get all users
     const users = await getAllUser();
-    if (users.length < 1 || !users)
-      return res
-        .status(404)
-        .json({ error: "No users Found", acknowledged: false });
+    if (users.length > 1 || users) {
+      const addNotify = { data: newNotify._id };
+      for (let val of users) {
+        val.notification = [...val.notification, addNotify];
 
-    const addNotify = { data: newNotify._id };
-    for (let val of users) {
-      val.notification = [...val.notification, addNotify];
-
-      await val.save();
+        await val.save();
+      }
     }
 
     return res.status(201).json({ acknowledged: true, data: newNotify });
