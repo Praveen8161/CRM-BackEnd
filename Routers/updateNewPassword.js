@@ -52,9 +52,10 @@ router.patch("/", verifyUser, async (req, res) => {
     // saving updated password
     req.user.token = "";
     req.user.password = hashedPassword;
+
     await req.user.save();
 
-    res
+    return res
       .status(200)
       .json({ message: "New password updated", acknowledged: true });
   } catch (err) {

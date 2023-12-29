@@ -15,6 +15,7 @@ import { updateRouter } from "./updateNewPassword.js";
 import { notificationRouter } from "./notificationRouter.js";
 import { profileRouter } from "./profileUpdate.js";
 import { serviceRouter } from "./serviceRouter.js";
+import { dataRouter } from "./dataRouter.js";
 
 const router = express.Router();
 
@@ -42,16 +43,24 @@ const checkAdmin = async (req, res, next) => {
 const checkUserByToken = async (req, res, next) => {
   try {
     const { id, token } = req.params;
-    // user exist
-    const user = await getAdminByToken(token);
 
-    if (!user) return res.status(404).json({ error: "user not found" });
+    // user exist
+    const user = await getAdminByToken(req);
+
+    if (!user)
+      return res
+        .status(404)
+        .json({ error: "user not found", acknowledged: false });
     req.user = user;
     req.token = token;
     req.id = id;
     next();
   } catch (err) {
-    res.status(500).json({ error: "Internal Server Error", message: err });
+    return res.status(500).json({
+      error: "Internal Server Error",
+      message: err,
+      acknowledged: false,
+    });
   }
 };
 
@@ -141,6 +150,7 @@ router.post("/signup", async (req, res) => {
 // login
 router.post("/login", async (req, res) => {
   try {
+    console.log(req.body);
     // user exist
     const user = await getAdmin(req);
     if (!user)
@@ -153,6 +163,8 @@ router.post("/login", async (req, res) => {
       req.body.password,
       user.password
     );
+
+    console.log(req.body);
 
     if (!validPassword)
       return res
@@ -172,6 +184,7 @@ router.post("/login", async (req, res) => {
 
     user.sessionToken = sesToken;
     const now = Date.now();
+    console.log(req.body);
     user.activity = [...user.activity, now];
 
     await user.save();
@@ -291,5 +304,8 @@ router.post("/check", checkAdminBySessionToken, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }
 });
+
+// Get Data
+router.use("/data", checkAdminBySessionToken, dataRouter);
 
 export const adminRouter = router;

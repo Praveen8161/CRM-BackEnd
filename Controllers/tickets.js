@@ -23,7 +23,7 @@ export function deleteTicket(req) {
 // create new Ticket
 export function createNewTicket(req) {
   return new Ticket({
-    ...req.body,
+    ...req.body.ticData,
     createdBy: req.user._id,
   }).save();
 }

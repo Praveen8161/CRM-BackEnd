@@ -2,8 +2,8 @@ import { Notification } from "../Schema/notification.js";
 import { User } from "../Schema/user.js";
 
 // Get Users Notification
-export function getNotifyByUser(req) {
-  return User.find({ sessionToken: req.body.sessionToken }).populate(
+export async function getNotifyByUser(req) {
+  return await User.findOne({ sessionToken: req.body.sessionToken }).populate(
     "notification.data"
   );
 }

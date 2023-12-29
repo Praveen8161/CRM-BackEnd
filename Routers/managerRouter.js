@@ -15,6 +15,7 @@ import { ticketRouter } from "./ticketRouter.js";
 import { notificationRouter } from "./notificationRouter.js";
 import { profileRouter } from "./profileUpdate.js";
 import { serviceRouter } from "./serviceRouter.js";
+import { dataRouter } from "./dataRouter.js";
 
 const router = express.Router();
 
@@ -43,7 +44,7 @@ const checkManagerByToken = async (req, res, next) => {
   try {
     const { id, token } = req.params;
     // user exist
-    const user = await getManagerByToken(token);
+    const user = await getManagerByToken(req);
 
     if (!user) return res.status(404).json({ error: "user not found" });
     req.user = user;
@@ -283,5 +284,8 @@ router.post("/check", checkManagerBySessionToken, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }
 });
+
+// Get Data
+router.use("/data", checkManagerBySessionToken, dataRouter);
 
 export const managerRouter = router;

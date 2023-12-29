@@ -11,7 +11,7 @@ export function newManager(user) {
 }
 
 // get Manager by token for updating password
-export async function getManagerByToken(token) {
+export async function getManagerByToken(req) {
   return Manager.findOne({ token: req.params.token });
 }
 

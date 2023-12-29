@@ -15,6 +15,7 @@ import { forgotRouter } from "./forgotPasswordRouter.js";
 import { notificationRouter } from "./notificationRouter.js";
 import { profileRouter } from "./profileUpdate.js";
 import { serviceRouter } from "./serviceRouter.js";
+import { dataRouter } from "./dataRouter.js";
 
 const router = express.Router();
 // middleware function for forgot password
@@ -185,7 +186,11 @@ router.post("/login", async (req, res) => {
       acknowledged: true,
     });
   } catch (err) {
-    res.status(500).json({ error: "Internal Server Error", message: err });
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: err,
+      acknowledged: false,
+    });
   }
 });
 
@@ -278,7 +283,7 @@ router.use("/update/:id/:token", checkUserByToken, updateRouter);
 router.use("/ticket", checkUserBySessionToken, ticketRouter);
 
 // notification
-router.use("/notify", notificationRouter);
+router.use("/notify", checkUserBySessionToken, notificationRouter);
 
 // Update Profile
 router.use("/profile/update", checkUserBySessionToken, profileRouter);
@@ -294,5 +299,8 @@ router.post("/check", checkUserBySessionToken, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }
 });
+
+// Get Data
+router.use("/data", checkUserBySessionToken, dataRouter);
 
 export const userRouter = router;

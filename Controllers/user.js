@@ -2,7 +2,7 @@ import { User } from "../Schema/user.js";
 
 // find one user by email
 export function getUser(req) {
-  return User.findOne({ email: req.body.email }).populate(notification.data);
+  return User.findOne({ email: req.body.email });
 }
 
 // find all user by email

@@ -25,13 +25,11 @@ router.post("/createservice", async (req, res) => {
         acknowledged: false,
       });
 
-    return res
-      .status(201)
-      .json({
-        acknowledged: true,
-        data: newService,
-        message: "New Service created",
-      });
+    return res.status(201).json({
+      acknowledged: true,
+      data: newService,
+      message: "New Service created",
+    });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }
@@ -40,6 +38,12 @@ router.post("/createservice", async (req, res) => {
 // Delete Service
 router.delete("/deleteservice", async (req, res) => {
   try {
+    if (req.user.role !== "Admin")
+      return res.status(404).json({
+        error: "Permission Denied",
+        acknowledged: false,
+      });
+
     // create new notification
     const rmService = await deleteService(req);
     if (!rmService)
@@ -53,24 +57,21 @@ router.delete("/deleteservice", async (req, res) => {
     if (!allUsers || allUsers.length < 1)
       return res
         .status(404)
-        .json({ acknowledged: false, error: "No user found" });
+        .json({ acknowledged: true, message: "service removed" });
 
     for (let val of allUsers) {
       let len = val.services.length;
       if (len > 0) {
-        for (let i = 0; i < len; i++) {
-          let serID = val.services.pop();
-          if (serID !== req.body._id) {
-            val.services.push(serID);
-          }
-        }
+        val.services = val.services.filter((data) => {
+          return data !== req.body.serviceId;
+        });
       }
       await val.save();
     }
 
     return res
       .status(201)
-      .json({ acknowledged: true, data: "service removed" });
+      .json({ acknowledged: true, message: "service removed" });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error", message: err });
   }
@@ -125,6 +126,7 @@ router.patch("/changeservice", async (req, res) => {
 // get services
 router.post("/getservices", async (req, res) => {
   try {
+    // Getting all services
     const allServices = await getAllServices();
     if (req.user.role !== "User") {
       return res.status(201).json({ acknowledged: true, allServices });

@@ -11,7 +11,7 @@ export function newAdmin(user) {
 }
 
 // get Admin by token for update password
-export async function getAdminByToken(token) {
+export async function getAdminByToken(req) {
   return Admin.findOne({ token: req.params.token });
 }
 

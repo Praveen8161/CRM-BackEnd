@@ -9,7 +9,7 @@ export function createService(req) {
 
 // Delete Service
 export function deleteService(req) {
-  return Service.deleteOne({ _id: req.body._id });
+  return Service.deleteOne({ _id: req.body.serviceId });
 }
 
 // Get Service with new user

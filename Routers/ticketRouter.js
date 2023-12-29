@@ -58,25 +58,21 @@ router.delete("/delete", async (req, res) => {
   try {
     if (req.user.role === "Admin") {
       const deleteOneTicket = await deleteTicket(req);
-      return res
-        .status(201)
-        .json({
-          message: "ticket deleted",
-          data: deleteOneTicket,
-          acknowledged: true,
-        });
+      return res.status(201).json({
+        message: "ticket deleted",
+        data: deleteOneTicket,
+        acknowledged: true,
+      });
     }
     return res
       .status(401)
       .json({ error: "permission denied", acknowledged: false });
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        error: "Internal Server Error",
-        message: err,
-        acknowledged: false,
-      });
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: err,
+      acknowledged: false,
+    });
   }
 });
 
@@ -129,7 +125,7 @@ router.post("/resolve", async (req, res) => {
 
     return res
       .status(201)
-      .json({ acknowledged: true, message: "Ticket Resolved" });
+      .json({ acknowledged: true, message: "Ticket Resolved", ticket });
   } catch (err) {
     res.status(500).json({
       error: "Internal Server Error",
