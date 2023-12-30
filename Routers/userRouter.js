@@ -18,6 +18,7 @@ import { serviceRouter } from "./serviceRouter.js";
 import { dataRouter } from "./dataRouter.js";
 
 const router = express.Router();
+
 // middleware function for forgot password
 const checkUser = async (req, res, next) => {
   try {
@@ -27,6 +28,8 @@ const checkUser = async (req, res, next) => {
       return res
         .status(404)
         .json({ error: "user not found", acknowledged: false });
+
+    // Saving User in request
     req.user = user;
     next();
   } catch (err) {
@@ -42,13 +45,15 @@ const checkUser = async (req, res, next) => {
 const checkUserByToken = async (req, res, next) => {
   try {
     const { id, token } = req.params;
-    // user exist
+    // user exist check
     const user = await getUserByToken(req);
 
     if (!user)
       return res
         .status(404)
         .json({ error: "user not found", acknowledged: false });
+
+    // Saving user and token in request
     req.user = user;
     req.token = token;
     req.id = id;
@@ -65,9 +70,11 @@ const checkUserByToken = async (req, res, next) => {
 // check user by Session Token for logout and to use App features
 const checkUserBySessionToken = async (req, res, next) => {
   try {
-    // user exist
+    // user exist check
     const user = await getUserBySessionToken(req);
     if (!user) return res.status(404).json({ error: "user not found" });
+
+    //  saving user in Request
     req.user = user;
     next();
   } catch (err) {
